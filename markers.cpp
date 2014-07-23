@@ -29,6 +29,12 @@
 #include <osg/ShapeDrawable>
 #include <iostream>
 #include <osgText/Text>
+//////////////////////////////////////////// 
+
+////////////////////////////////////////////for algebra
+#include <gmtl/gmtl.h>
+#include <gmtl/Matrix.h>
+
 ////////////////////////////////////////////
 #include "NPTrackingTools.h"
 
@@ -159,7 +165,7 @@ DWORD WINAPI iniciarOSG(LPVOID lpParam){
 
    // Esfera direccion
    osg::Geode* puntoDireccionGeode = new osg::Geode();
-   osg::Sphere* puntoDireccion = new osg::Sphere( osg::Vec3(0,0,0), 0.4);
+   osg::Sphere* puntoDireccion = new osg::Sphere( osg::Vec3(0,0,0), 0.1);
    osg::ShapeDrawable* puntoDireccionDrawable = new osg::ShapeDrawable(puntoDireccion);
    puntoDireccionDrawable->setColor( osg::Vec4(255.0, 0.0, 0.0, 1.0) );
    puntoDireccionGeode->addDrawable(puntoDireccionDrawable);
@@ -342,6 +348,34 @@ DWORD WINAPI iniciarOSG(LPVOID lpParam){
    }
 	return 0;
 }
+
+void calcularOrientacion(gmtl::Vec3f m1,gmtl::Vec3f m2, gmtl::Vec3f m3, gmtl::Vec3f posicion){
+	gmtl::Vec3f vector1,vector2,dir;
+		vector1 = m1-m2;
+		vector2=m3-m2;
+		gmtl::cross(dir,vector2,vector1);
+		float posicionX=posicion[0];
+		float posicionY=posicion[1];
+		float posicionZ=posicion[2];
+		float x1= posicionX-(dir[0]);
+		float y1= posicionY-(dir[1]);
+		float z1=posicionZ-(dir[2]);
+
+		float a=-x1+posicionX; // vector direccion
+		float b=-y1+posicionY;
+	float c=-z1+posicionZ;
+	// printf("Tracker Position:(%.4f,%.4f,%.4f) Orientation:(%.2f,%.2f,%.2f,%.2f) yInter:%.2f \n",
+      //  x, y, z,
+       // qx, qy, qz, qw,b);
+	if(b!=0.0){
+		float t=-posicionY/b;
+		positionX_final=posicionX+t*a;
+		positionY_final=0.0;
+		positionZ_final=posicionZ+t*c;
+		
+
+	}
+}
 // Main application
 int main( int argc, char* argv[] )
 {
@@ -407,7 +441,7 @@ int main( int argc, char* argv[] )
             frameCounter++;
 
             // Update tracking information every 100 frames (for example purposes).
-            if( (frameCounter%25) == 0 )
+            if( (frameCounter%10) == 0 )
             {
                 float   yaw,pitch,roll;
                 float   x,y,z;
@@ -430,7 +464,7 @@ int main( int argc, char* argv[] )
 							positionY=y*10.0f;
 							positionZ=z*-10.0f;
 
-	dirx= 2*(qx * qy - qz*qw);
+/*	dirx= 2*(qx * qy - qz*qw);
 	diry = 1-2*(qx*qx+qz*qz);
 	dirz= 2*(qy*qz+qx*qw);
 
@@ -462,7 +496,7 @@ int main( int argc, char* argv[] )
        positionX_final,positionY_final,positionZ_final);
 
 						
-	}
+	}*/
 						//positionX_final=x*10.0f;
 						//positionY_final=y*10.0f;
 						//positionZ_final=z*-10.0f;
@@ -484,12 +518,20 @@ int main( int argc, char* argv[] )
                         worldTransform.Invert();
 
                         float   mx, my, mz;
+						gmtl::Vec3f m1,m2,m3,posicion; /// 
                         int     markerCount = TT_TrackableMarkerCount( i );
                         for( int j = 0; j < markerCount; ++j )
                         {
                             // Get the world-space coordinates of each rigid body marker.
                             TT_TrackablePointCloudMarker( i, j, tracked, mx, my, mz );
-
+							if(j==0){
+								m1=gmtl::Vec3f(mx,my,-1.0f*mz);
+							}else if(j==1){
+								m2=gmtl::Vec3f(mx,my,-1.0f*mz);
+							}
+							else{
+								m3=gmtl::Vec3f(mx,my,-1.0f*mz);
+							}
                             // Transform the rigid body point from world coordinates to local rigid body coordinates.
                             // Any world-space point can be substituted here to transform it into the local space of
                             // the rigid body.
@@ -499,6 +541,9 @@ int main( int argc, char* argv[] )
                             printf( "\t\t%d: World (%.3f, %.3f, %.3f) Local (%.3f, %.3f, %.3f)\n", j + 1, 
                                 mx, my, mz, localPnt[0], localPnt[1], localPnt[2] );
                         }
+
+						posicion=gmtl::Vec3f(positionX,positionY,positionZ);
+						calcularOrientacion(m1,m2,m3,posicion);
                     }
                     else
                     {

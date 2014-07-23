@@ -76,7 +76,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(OSG_INCLUDE_PATH);C:\Program Files %28x86%29\OptiTrack\Motive\inc;$(NPTRACKINGTOOLS_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\OptiTrack\Motive\Samples\markers - Copy (2)\gmtl-0.6.1;$(OSG_INCLUDE_PATH);C:\Program Files %28x86%29\OptiTrack\Motive\inc;$(NPTRACKINGTOOLS_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;STATIC_RB_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
